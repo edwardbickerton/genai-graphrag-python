@@ -28,9 +28,10 @@ RETURN node.text as text, score
 # end::simple_retrieval_query[]
 # tag::retrieval_query[]
 retrieval_query = """
+MATCH (node)-[:FROM_DOCUMENT]->(d)-[:PDF_OF]->(lesson)
 RETURN DISTINCT
     node.text as text, score,
-    collect { MATCH (node)-[:FROM_DOCUMENT]->(d)-[:PDF_OF]->(lesson) RETURN lesson.url} as lesson_url,
+    lesson.url as lesson_url,
     collect { MATCH (node)<-[:FROM_CHUNK]-(e:Technology) RETURN e.name } as technologies,
     collect { MATCH (node)<-[:FROM_CHUNK]-(e:Concept) RETURN e.name } as concepts
 """
