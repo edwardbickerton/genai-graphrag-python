@@ -36,6 +36,29 @@ RETURN DISTINCT
     collect { MATCH (node)<-[:FROM_CHUNK]-(e:Concept) RETURN e.name } as concepts
 """
 # end::retrieval_query[]
+# tag::advanced_retrieval_query[]
+retrieval_query = """
+MATCH (node)-[:FROM_DOCUMENT]->(d)-[:PDF_OF]->(lesson)
+RETURN
+    node.text as text, score,
+    lesson.url as lesson_url,
+    collect { 
+        MATCH (node)<-[:FROM_CHUNK]-(entity)-[r]->(other)-[:FROM_CHUNK]->()
+        WITH toStringList([
+            labels(entity)[2], 
+            entity.name, 
+            entity.type, 
+            entity.description, 
+            type(r), 
+            labels(other)[2], 
+            other.name, 
+            other.type, 
+            other.description
+            ]) as values
+        RETURN reduce(acc = "", item in values | acc || coalesce(item || ' ', ''))
+    } as associated_entities
+"""
+# end::advanced_retrieval_query[]
 
 # Create retriever
 # tag::retriever[]
