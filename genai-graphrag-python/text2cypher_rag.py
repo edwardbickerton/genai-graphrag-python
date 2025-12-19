@@ -39,7 +39,7 @@ rag = GraphRAG(
     llm=llm
 )
 
-query_text = "How many technologies are mentioned in the knowledge graph?"
+query_text = "How does Neo4j relate to other technologies?"
 
 response = rag.search(
     query_text=query_text,

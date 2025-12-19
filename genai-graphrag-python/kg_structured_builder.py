@@ -1,15 +1,19 @@
-import os
-from dotenv import load_dotenv
-load_dotenv()
-
 import asyncio
 import csv
+import os
+import time
 
+from dotenv import load_dotenv
 from neo4j import GraphDatabase
-from neo4j_graphrag.llm import OpenAILLM
 from neo4j_graphrag.embeddings import OpenAIEmbeddings
+from neo4j_graphrag.experimental.components.text_splitters.fixed_size_splitter import (
+    FixedSizeSplitter,
+)
 from neo4j_graphrag.experimental.pipeline.kg_builder import SimpleKGPipeline
-from neo4j_graphrag.experimental.components.text_splitters.fixed_size_splitter import FixedSizeSplitter
+from neo4j_graphrag.llm import OpenAILLM
+
+load_dotenv()
+
 
 neo4j_driver = GraphDatabase.driver(
     os.getenv("NEO4J_URI"),
@@ -37,12 +41,13 @@ NODE_TYPES = [
     "Example",
     "Process",
     "Challenge",
-    {"label": "Benefit", "description": "A benefit or advantage of using a technology or approach."},
+    {"label": "Benefit",
+        "description": "A benefit or advantage of using a technology or approach."},
     {
         "label": "Resource",
         "description": "A related learning resource such as a book, article, video, or course.",
         "properties": [
-            {"name": "name", "type": "STRING", "required": True}, 
+            {"name": "name", "type": "STRING", "required": True},
             {"name": "type", "type": "STRING"}
         ]
     },
@@ -72,9 +77,9 @@ PATTERNS = [
 
 kg_builder = SimpleKGPipeline(
     llm=llm,
-    driver=neo4j_driver, 
-    neo4j_database=os.getenv("NEO4J_DATABASE"), 
-    embedder=embedder, 
+    driver=neo4j_driver,
+    neo4j_database=os.getenv("NEO4J_DATABASE"),
+    embedder=embedder,
     from_pdf=True,
     text_splitter=text_splitter,
     schema={
@@ -119,4 +124,4 @@ for doc in docs_csv:
         database_=os.getenv("NEO4J_DATABASE")
     )
     print(result, summary.counters)
-
+    time.sleep(30)
